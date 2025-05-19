@@ -132,6 +132,12 @@ class TestAccount(unittest.TestCase):
         accounts = Account.all()
         self.assertEqual(len(accounts), 5)
 
+    def test_list_no_accounts_found(self):
+        """It should return an empty list if there are no Accounts in the database"""
+        accounts = Account.all()
+        self.assertEqual(accounts, [])
+        self.assertEqual(len(accounts), 0)
+
     def test_find_by_name(self):
         """It should Find an Account by name"""
         account = AccountFactory()
