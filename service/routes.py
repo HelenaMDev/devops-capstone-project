@@ -42,7 +42,7 @@ def index():
 def create_accounts():
     """
     Creates an Account
-    This endpoint will create an Account based the data in the body that is posted
+    This endpoint will create an Account based on the data in the body that is posted
     """
     app.logger.info("Request to create an Account")
     check_content_type("application/json")
@@ -61,7 +61,19 @@ def create_accounts():
 # LIST ALL ACCOUNTS
 ######################################################################
 
-# ... place you code here to LIST accounts ...
+@app.route("/accounts", methods=["GET"])
+def list_accounts():
+    """
+    Returns all the Accounts
+    """
+    app.logger.info("List all the Accounts")
+    accounts = Account.all()
+    message = []
+    for account in accounts :
+        message.append(account.serialize())
+    return make_response(
+        jsonify(message), status.HTTP_200_OK
+    )
 
 
 ######################################################################
