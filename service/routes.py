@@ -70,15 +70,13 @@ def list_accounts():
     app.logger.info("List all the Accounts")
 
     accounts = Account.all()
-    message = []
-    for account in accounts :
-        message.append(account.serialize())
 
-    app.logger.info("Returning [%s] accounts", len(account_list))        
+    message = [account.serialize() for account in accounts]
 
-    return make_response(
-        jsonify(message), status.HTTP_200_OK
-    )
+    app.logger.info("Returning [%s] accounts", len(message))
+
+    return jsonify(message), status.HTTP_200_OK
+
 
 
 ######################################################################
