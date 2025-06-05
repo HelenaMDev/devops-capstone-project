@@ -70,7 +70,6 @@ class TestAccountService(TestCase):
             accounts.append(account)
         return accounts
 
-
     def test_method_not_allowed(self):
         """It should not allow an illegal method call"""
         resp = self.client.delete(BASE_URL)
@@ -143,7 +142,7 @@ class TestAccountService(TestCase):
             content_type="test/html"
         )
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
- 
+
     def test_list_all_accounts(self):
         """It should list all accounts"""
         # Arrange: create some accounts
@@ -166,7 +165,7 @@ class TestAccountService(TestCase):
             found = next((item for item in data if item["id"] == account.id), None)
             self.assertIsNotNone(found)
             self.assertEqual(found["name"], account.name)
-            self.assertEqual(found["email"], account.email)       
+            self.assertEqual(found["email"], account.email)
 
     def test_read_account_api(self):
         """It should GET a single account by ID via the API"""
@@ -184,17 +183,15 @@ class TestAccountService(TestCase):
         self.assertEqual(data["phone_number"], account.phone_number)
         self.assertEqual(data["date_joined"], account.date_joined)
 
-
     def test_read_account_not_found(self):
         """It should return 404 if account is not found"""
         resp = self.client.get("/accounts/999999")  # unlikely ID
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)        
 
-
     def test_delete_account(self):
         """It should Delete an Account"""
         account = self._create_accounts(1)[0]
         resp = self.client.delete(f"{BASE_URL}/{account.id}")
-        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)        
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
 
