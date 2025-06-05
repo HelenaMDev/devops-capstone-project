@@ -186,12 +186,10 @@ class TestAccountService(TestCase):
     def test_read_account_not_found(self):
         """It should return 404 if account is not found"""
         resp = self.client.get("/accounts/999999")  # unlikely ID
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)        
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_account(self):
         """It should Delete an Account"""
         account = self._create_accounts(1)[0]
         resp = self.client.delete(f"{BASE_URL}/{account.id}")
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
-
-
