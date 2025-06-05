@@ -128,7 +128,7 @@ class TestAccount(unittest.TestCase):
         self.assertEqual(accounts, [])
         for account in AccountFactory.create_batch(5):
             account.create()
-        # Assert that there are not 5 accounts in the database
+        # Assert that there are now 5 accounts in the database
         accounts = Account.all()
         self.assertEqual(len(accounts), 5)
 

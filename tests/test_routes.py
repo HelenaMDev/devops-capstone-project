@@ -70,7 +70,13 @@ class TestAccountService(TestCase):
             accounts.append(account)
         return accounts
 
-    ######################################################################
+
+    def test_method_not_allowed(self):
+        """It should not allow an illegal method call"""
+        resp = self.client.delete(BASE_URL)
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        ######################################################################
     #  A C C O U N T   T E S T   C A S E S
     ######################################################################
 
@@ -113,6 +119,21 @@ class TestAccountService(TestCase):
         response = self.client.post(BASE_URL, json={"name": "not enough data"})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_update_account(self):
+        """It should Update an existing Account"""
+        # create an Account to update
+        test_account = AccountFactory()
+        resp = self.client.post(BASE_URL, json=test_account.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # update the account
+        new_account = resp.get_json()
+        new_account["name"] = "Name"
+        resp = self.client.put(f"{BASE_URL}/{new_account['id']}", json=new_account)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        updated_account = resp.get_json()
+        self.assertEqual(updated_account["name"], "Name")
+
     def test_unsupported_media_type(self):
         """It should not Create an Account when sending the wrong media type"""
         account = AccountFactory()
@@ -122,5 +143,58 @@ class TestAccountService(TestCase):
             content_type="test/html"
         )
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+ 
+    def test_list_all_accounts(self):
+        """It should list all accounts"""
+        # Arrange: create some accounts
+        account1 = AccountFactory()
+        account1.create()
+        account2 = AccountFactory()
+        account2.create()
 
-    # ADD YOUR TEST CASES HERE ...
+        # Act: call the endpoint
+        resp = self.client.get("/accounts")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertIsInstance(data, list)
+        # Check that both accounts are in the response
+        returned_ids = [item["id"] for item in data]
+        self.assertIn(account1.id, returned_ids)
+        self.assertIn(account2.id, returned_ids)
+        # Optionally, check other fields
+        for account in [account1, account2]:
+            found = next((item for item in data if item["id"] == account.id), None)
+            self.assertIsNotNone(found)
+            self.assertEqual(found["name"], account.name)
+            self.assertEqual(found["email"], account.email)       
+
+    def test_read_account_api(self):
+        """It should GET a single account by ID via the API"""
+        account = AccountFactory()
+        account.create()
+
+        # Make a GET request to the API endpoint
+        resp = self.client.get(f"/accounts/{account.id}")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data["id"], account.id)
+        self.assertEqual(data["name"], account.name)
+        self.assertEqual(data["email"], account.email)
+        self.assertEqual(data["address"], account.address)
+        self.assertEqual(data["phone_number"], account.phone_number)
+        self.assertEqual(data["date_joined"], account.date_joined)
+
+
+    def test_read_account_not_found(self):
+        """It should return 404 if account is not found"""
+        resp = self.client.get("/accounts/999999")  # unlikely ID
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)        
+
+
+    def test_delete_account(self):
+        """It should Delete an Account"""
+        account = self._create_accounts(1)[0]
+        resp = self.client.delete(f"{BASE_URL}/{account.id}")
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)        
+
+
