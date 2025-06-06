@@ -181,7 +181,8 @@ class TestAccountService(TestCase):
         self.assertEqual(data["email"], account.email)
         self.assertEqual(data["address"], account.address)
         self.assertEqual(data["phone_number"], account.phone_number)
-        self.assertEqual(data["date_joined"], account.date_joined)
+#        self.assertEqual(data["date_joined"], account.date_joined)
+        self.assertEqual(data["date_joined"], str(account.date_joined))
 
     def test_read_account_not_found(self):
         """It should return 404 if account is not found"""
