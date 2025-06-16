@@ -13,7 +13,9 @@ spec:
     - name: pipeline-workspace
   params:
     - name: repo-url
+      type: string
     - name: branch
+      type: string
       default: main
   tasks:
     - name: init
@@ -31,9 +33,9 @@ spec:
         name: git-clone
       params:
       - name: url
-        value: $(params.repo-url)
+        value: "$(params.repo-url)"
       - name: revision
-        value: $(params.branch)
+        value: "$(params.branch)"
       runAfter:
         - init
 
@@ -47,7 +49,12 @@ spec:
       - name: image
         value: "python:3.9-slim"
       - name: args
-        value: ["--count","--max-complexity=10","--max-line-length=127","--statistics"]
+        value:
+          - "--count"
+          - "--max-complexity=10"
+          - "--max-line-length=127"
+          - "--statistics"
+
       runAfter:
         - clone
 
@@ -61,5 +68,6 @@ spec:
       - name: database_uri
         value: "sqlite:///test.db"
       - name: args
+        value: ["-v","--with-spec","--spec-color"]
       runAfter:
         - clone        
